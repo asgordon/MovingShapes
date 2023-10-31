@@ -7,3 +7,6 @@ __pycache__/
 
 # Operating System - Mac OS X
 .DS_Store
+
+# ipynb checkpoints
+.ipynb_checkpoints
