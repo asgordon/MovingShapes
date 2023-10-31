@@ -10,3 +10,6 @@ __pycache__/
 
 # ipynb checkpoints
 .ipynb_checkpoints
+
+# Notes to self
+todo.txt
