@@ -18,6 +18,10 @@ CHARADES_2C_PATH = os.path.join(CHARADES_PATH, '2-character-data')
 CHARADES_2C_LABELS = ['accompany', 'argue with', 'avoid', 'block', 'capture', 'chase', 'creep up on', 'encircle', 'follow', 'herd', 'hit', 'huddle with', 'kiss', 'lead', 'leave', 'mimic', 'poke', 'pull', 'push', 'scratch', 'throw', 'flirt with', 'hug', 'talk to', 'play with', 'approach', 'bother', 'escape', 'tickle', 'examine', 'ignore', 'fight']
 CHARADES_1C_LABELS = ['accelerate', 'bolt', 'bow', 'creep', 'dance', 'drift', 'flinch', 'fly', 'gallop', 'glide', 'hop', 'jump', 'limp', 'march', 'meander', 'nod', 'roam', 'roll', 'run', 'scurry', 'shake', 'decelerate', 'stroll', 'strut', 'stumble', 'swim', 'trudge', 'turn', 'waddle', 'wave', 'spin']
 
+TRICOPA_PATH = os.path.join(os.path.dirname(__file__), 'trianglecopa')
+TRICOPA_DATA_PATH = os.path.join(TRICOPA_PATH, 'data')
+TRICOPA_ID_PATH = os.path.join(TRICOPA_PATH, 'performance_ids.txt')
+
 def load_data(fn):
     with open(fn) as file: result = _parse(file.read())
     return result
@@ -89,4 +93,22 @@ def charades2c():
                 stage = 'bt-lt'
                 data = load_data(datum_path)
                 res.append(Performance(id = id, stage = stage, data = data, label = label))
+    return res
+
+def tricopa():
+    '''returns a list of 100 Performance objects representing each of the 100 Triangle COPA animations'''
+    res = []
+    ids = {}
+    with open(TRICOPA_ID_PATH) as f:
+        lines = f.readlines()
+        for line in lines[1:]:
+            parts = line.split()
+            ids[parts[0]] = parts[1]
+    for i in range(100): # 0 to 99
+        question = str(i + 1)
+        id = ids[question]
+        data = load_data(os.path.join(TRICOPA_DATA_PATH, "{}.txt".format(id)))
+        stage = 'box-bt-lt-c'
+        title = "Question " + question
+        res.append(Performance(id = id, stage = stage, data = data, title = title ))
     return res
