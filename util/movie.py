@@ -162,10 +162,10 @@ class HSMovie:
         clip.write_videofile(output_path, fps = self.fps)
 
     def row_at_time(self, ms):
-        res = self.data[0]
+        res = self.data[0].copy()
         for row in self.data:
             if row[0] > ms: break
-            res = row
+            res = row.copy()
             res[0] = ms
         return res
         
