@@ -2,29 +2,20 @@
 # Animation datasets from Charades and HSIT web applications
 # Andrew S. Gordon
 
-import os, json, re
+import json, re, pkgutil, importlib.resources
 
 COLUMN_LABELS = ['ms', 'btx', 'bty', 'btr', 'ltx', 'lty', 'ltr', 'cx', 'cy', 'cr', 'dr']
 STAGES = ['bt', 'bt-lt', 'box-bt-lt-c']
 
-IEC_PATH = os.path.join(os.path.dirname(__file__), 'iec')
-IEC_DATA_PATH = os.path.join(IEC_PATH, 'data')
-IEC_JSON_PATH = os.path.join(IEC_PATH, 'extra-credit-text-only.json')
-IEC_IDS_PATH = os.path.join(IEC_PATH, 'ids.txt')
 
-CHARADES_PATH = os.path.join(os.path.dirname(__file__), 'charades')
-CHARADES_1C_PATH = os.path.join(CHARADES_PATH, '1-character-data')
-CHARADES_2C_PATH = os.path.join(CHARADES_PATH, '2-character-data')
 CHARADES_2C_LABELS = ['accompany', 'argue with', 'avoid', 'block', 'capture', 'chase', 'creep up on', 'encircle', 'follow', 'herd', 'hit', 'huddle with', 'kiss', 'lead', 'leave', 'mimic', 'poke', 'pull', 'push', 'scratch', 'throw', 'flirt with', 'hug', 'talk to', 'play with', 'approach', 'bother', 'escape', 'tickle', 'examine', 'ignore', 'fight']
 CHARADES_1C_LABELS = ['accelerate', 'bolt', 'bow', 'creep', 'dance', 'drift', 'flinch', 'fly', 'gallop', 'glide', 'hop', 'jump', 'limp', 'march', 'meander', 'nod', 'roam', 'roll', 'run', 'scurry', 'shake', 'decelerate', 'stroll', 'strut', 'stumble', 'swim', 'trudge', 'turn', 'waddle', 'wave', 'spin']
 
-TRICOPA_PATH = os.path.join(os.path.dirname(__file__), 'trianglecopa')
-TRICOPA_DATA_PATH = os.path.join(TRICOPA_PATH, 'data')
-TRICOPA_ID_PATH = os.path.join(TRICOPA_PATH, 'performance_ids.txt')
-
-def load_data(fn):
-    with open(fn) as file: result = _parse(file.read())
-    return result
+def _get_data(filename):
+    data = pkgutil.get_data("movingshapes", filename)
+    if data is None:
+        raise FileNotFoundError(f"Data file not found: {filename}")
+    return data.decode("utf-8")
 
 def _parse(raw):
     result = []
@@ -47,37 +38,37 @@ class Performance():
 def iec():
     '''returns a list of 131 Performance objects representing the IEC dataset'''
     res = []
-    with open(IEC_JSON_PATH) as f: iec_json = json.load(f)
+    json_data = _get_data("iec/extra-credit-text-only.json")
+    iec_json = json.loads(json_data)
     for d in iec_json:
         id = d['id']
         title = d['title']
         narrative = d['note']
-        data = load_data(os.path.join(IEC_DATA_PATH, "{}.txt".format(str(id))))
+        data = _parse(_get_data(f"iec/data/{id}.txt"))
         stage = 'box-bt-lt-c'
         res.append(Performance(id = id, stage = stage, data = data, title = title, narrative = narrative))
     return res
 
 def _get_datum_paths(directory):
-    file_paths = []
-    for file_name in os.listdir(directory):
-        file_path = os.path.join(directory, file_name)
-        if os.path.isfile(file_path):
-            file_paths.append(file_path)
-    return file_paths
+    try:
+        data_dir = importlib.resources.files("movingshapes").joinpath(directory)
+        return [f.name for f in data_dir.iterdir() if f.is_file()]
+    except Exception as e:
+        print(f"Error: {e}")
+        return []
 
 def charades1c():
     '''returns a list of 2611 Performance objects representing the 1-character Triangle Charades dataset'''
     res = []
     pattern = r".+\.txt$"
     for label in CHARADES_1C_LABELS:
-        for datum_path in _get_datum_paths(os.path.join(CHARADES_1C_PATH, label)):
-            basename = os.path.basename(datum_path)
-            match = re.search(pattern, basename) # looking for "###.txt"
+        for filename in _get_datum_paths(f"charades/1-character-data/{label}"):
+            match = re.search(pattern, filename) # looking for "###.txt"
             if match:
-                id = ''.join([char for char in basename if char.isnumeric()])
+                id = ''.join([c for c in filename if c.isdigit()])
                 stage = 'bt'
-                data = load_data(datum_path)
-                res.append(Performance(id = id, stage = stage, data = data, label = label))
+                data = _parse(_get_data(f"charades/1-character-data/{label}/{filename}"))
+                res.append(Performance(id=id, stage=stage, data=data, label=label))
     return res
 
 def charades2c():
@@ -85,13 +76,12 @@ def charades2c():
     res = []
     pattern = r".+\.txt$"
     for label in CHARADES_2C_LABELS:
-        for datum_path in _get_datum_paths(os.path.join(CHARADES_2C_PATH, label)):
-            basename = os.path.basename(datum_path)
-            match = re.search(pattern, basename) # looking for "###.txt"
+        for filename in _get_datum_paths(f"charades/2-character-data/{label}"):
+            match = re.search(pattern, filename) # looking for "###.txt"
             if match:
-                id = ''.join([char for char in basename if char.isnumeric()])
+                id = ''.join([char for char in filename if char.isdigit()])
                 stage = 'bt-lt'
-                data = load_data(datum_path)
+                data = _parse(_get_data(f"charades/2-character-data/{label}/{filename}"))
                 res.append(Performance(id = id, stage = stage, data = data, label = label))
     return res
 
@@ -99,15 +89,15 @@ def tricopa():
     '''returns a list of 100 Performance objects representing each of the 100 Triangle COPA animations'''
     res = []
     ids = {}
-    with open(TRICOPA_ID_PATH) as f:
-        lines = f.readlines()
-        for line in lines[1:]:
-            parts = line.split()
-            ids[parts[0]] = parts[1]
+    ids_data = _get_data("trianglecopa/performance_ids.txt")
+    lines = ids_data.splitlines()
+    for line in lines[1:]:
+        parts = line.split()
+        ids[parts[0]] = parts[1]
     for i in range(100): # 0 to 99
         question = str(i + 1)
         id = ids[question]
-        data = load_data(os.path.join(TRICOPA_DATA_PATH, "{}.txt".format(id)))
+        data = _parse(_get_data(f"trianglecopa/data/{id}.txt"))
         stage = 'box-bt-lt-c'
         title = "Question " + question
         res.append(Performance(id = id, stage = stage, data = data, title = title ))
