@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools >= 45"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "movingshapes"
+version = "0.1.0"
+description = "Triangle Charades and HSIT animation datasets"
+readme = "README.md"
+authors = [{name = "Andrew S. Gordon", email = "gordon@ict.usc.edu"}]
+license = {text = "BSD-2-Clause"}
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"movingshapes" = ["charades/**/*", "iec/**/*", "trianglecopa/**/*"]

@@ -1,15 +1,22 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-
 # C extensions
 *.so
 
 # Operating System - Mac OS X
 .DS_Store
 
-# ipynb checkpoints
-.ipynb_checkpoints
-
 # Notes to self
 todo.txt
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# ipynb checkpoints
+.ipynb_checkpoints
