@@ -6,6 +6,8 @@ from .moving_shapes import iec, charades1c, charades2c, tricopa
 from .moving_shapes import Performance
 from .moving_shapes import COLUMN_LABELS, STAGES
 
+from .movie import Movie
+
 # Define public API
 __all__ = [
     "iec",
@@ -15,6 +17,7 @@ __all__ = [
     "Performance",
     "COLUMN_LABELS",
     "STAGES",
+    "Movie",
     "__version__",
 ]
 

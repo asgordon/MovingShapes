@@ -10,7 +10,9 @@ readme = "README.md"
 requires-python = ">=3.8"
 authors = [{name = "Andrew S. Gordon", email = "gordon@ict.usc.edu"}]
 license = {text = "BSD-2-Clause"}
-dependencies = []
+dependencies = [
+    "pillow>=10.4.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
