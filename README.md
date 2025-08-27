@@ -50,18 +50,10 @@ The following papers describe an early supervised machine learning approach to t
 
 Provided in this repository are user-contributed and user-validated animations corresponding to 31 one-character action labels and 32 two-character action labels, collected using the TriangleCharades web application.
 
-## Python API
+## Python package
 
-To aid in the analysis of these datasets, a simple Python API (*moving_shapes.py*) is provided that loads the data so that it can be easily routed to other data-analysis tools.
+To aid in the analysis of these datasets, a simple Python package (*movingshapes*) is provided to load each dataset so that it can be easily routed to other data-analysis tools.
 
-Examples for using this API are provided in the *examples.ipynb* Jupyter notebook.
+Also included in this Python modele is a tool for exporting performances as mp4 movies (requires *ffmpeg*) or as image files, using the *Pillow* library.
 
-## Utilities
-
-Included in this repository are some useful utilities.
-
-**util/viewer.py** is a utility for that recreates a visualization of an animation, taking its data file as an input parameter.
-This utility is based on the *graphics.py* library written by John Zelle, which is included in the util/ folder.
-
-**util/movie.py** is a utility for generating movie files or images of specific frames from any animation in the datasets.
-This utility uses the dataset API along with the popular *Pillow* and *MoviePy* python modules.
+Examples for using this package are provided in the *examples/** folder.
